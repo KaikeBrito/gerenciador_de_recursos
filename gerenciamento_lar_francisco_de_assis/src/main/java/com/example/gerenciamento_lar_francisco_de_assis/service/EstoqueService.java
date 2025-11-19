@@ -1,5 +1,6 @@
 package com.example.gerenciamento_lar_francisco_de_assis.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +50,7 @@ public class EstoqueService {
     }
 
     @Transactional
-    public void adicionarEstoque(Produto produto, Localizacao localizacao, int quantidade) {
+    public void adicionarEstoque(Produto produto, Localizacao localizacao, int quantidade, LocalDate validade) {
         if (quantidade <= 0) {
             throw new BusinessRuleException("Quantidade de entrada deve ser positiva.");
         }
@@ -60,11 +61,15 @@ public class EstoqueService {
         if (estoqueOpt.isPresent()) {
             estoque = estoqueOpt.get();
             estoque.setQuantidadeAtual(estoque.getQuantidadeAtual() + quantidade);
+            if (validade != null) {
+                estoque.setDataValidade(validade);
+            }
         } else {
             estoque = Estoque.builder()
                     .produto(produto)
                     .localizacao(localizacao)
                     .quantidadeAtual(quantidade)
+                    .dataValidade(validade)
                     .nivelMinimoAlerta(0) // Define um padrão
                     .build();
         }

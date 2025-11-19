@@ -3,6 +3,7 @@ package com.example.gerenciamento_lar_francisco_de_assis.domain.entity;
 import java.util.List;
 
 import com.example.gerenciamento_lar_francisco_de_assis.domain.enums.TipoPessoa;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -58,6 +59,7 @@ public class Doador {
     @Size(max = 20)
     private String telefone;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "doador")
     @ToString.Exclude
     private List<EntradaDoacao> doacoes;

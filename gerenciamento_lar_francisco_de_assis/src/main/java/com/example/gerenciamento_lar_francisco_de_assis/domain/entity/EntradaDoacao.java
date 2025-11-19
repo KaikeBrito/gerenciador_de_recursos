@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,16 +23,14 @@ public class EntradaDoacao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_doador") // Pode ser nulo (doação anônima)
-    @ToString.Exclude
     private Doador doador;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_usuario_registro", nullable = false)
-    @ToString.Exclude
     private Usuario usuarioRegistro;
 
     @CreationTimestamp
@@ -43,7 +43,8 @@ public class EntradaDoacao {
     @Size(max = 500)
     private String observacoes;
 
-    // Se a "Entrada" for deletada, os itens dela também são.
+    // Se a "Entrada" for deletada, os itens dela também são.]
+    @JsonIgnore
     @OneToMany(mappedBy = "entrada", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<ItemEntrada> itens;

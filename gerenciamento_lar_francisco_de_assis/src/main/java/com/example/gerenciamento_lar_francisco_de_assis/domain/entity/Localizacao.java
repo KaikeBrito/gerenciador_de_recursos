@@ -7,6 +7,8 @@ import lombok.*;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,6 +30,7 @@ public class Localizacao {
     @Size(max = 255)
     private String descricao;
     
+    @JsonIgnore
     @OneToMany(mappedBy = "localizacao")
     @ToString.Exclude
     private List<Estoque> estoques;

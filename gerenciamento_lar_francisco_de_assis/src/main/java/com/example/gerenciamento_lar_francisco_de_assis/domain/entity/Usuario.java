@@ -41,7 +41,8 @@ public class Usuario {
     @Size(min = 8) // Armazene apenas o hash, não a senha pura
     @Column(nullable = false)
     private String senha;
-
+    
+    @JsonIgnore
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

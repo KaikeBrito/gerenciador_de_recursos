@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,7 +17,6 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "estoque",
-    // Garante que só existe um registro de estoque por produto/localização
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {"id_produto", "id_localizacao"})
     }
@@ -26,15 +28,13 @@ public class Estoque {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_produto", nullable = false)
-    @ToString.Exclude
     private Produto produto;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_localizacao", nullable = false)
-    @ToString.Exclude
     private Localizacao localizacao;
 
     @NotNull
@@ -43,6 +43,8 @@ public class Estoque {
 
     private Integer nivelMinimoAlerta;
 
+    private LocalDate dataValidade;
+    
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime ultimaAtualizacao;

@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class SaidaRecurso {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_usuario_registro", nullable = false)
     @ToString.Exclude
     private Usuario usuarioRegistro;
@@ -41,6 +43,7 @@ public class SaidaRecurso {
     private String justificativa;
 
     // Se a "Saída" for deletada, os itens dela também são.
+    @JsonIgnore
     @OneToMany(mappedBy = "saida", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<ItemSaida> itens;

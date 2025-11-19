@@ -23,7 +23,12 @@ INSERT INTO doadores (id, nome, tipo_pessoa, documento, email, telefone) VALUES 
 INSERT INTO doadores (id, nome, tipo_pessoa, documento, email, telefone) VALUES (2, 'Ana Silva Costa', 'PF', '111.222.333-44', 'ana.silva@email.com', '859999-1010');
 INSERT INTO doadores (id, nome, tipo_pessoa, documento, email, telefone) VALUES (3, 'Farmácia Pague Menos S/A', 'PJ', '07.728.495/0001-57', 'doacoes@paguemenos.com.br', '854000-1000');
 
--- 4. PRODUTOS (Os itens que serão gerenciados)
+-- 4. USUÁRIOS
+-- (Deixamos vazio para que você possa criar usuários via
+-- POST /api/v1/auth/register e /api/v1/usuarios
+-- sem causar conflitos de ID).
+
+-- 5. PRODUTOS (Os itens que serão gerenciados)
 INSERT INTO produtos (id, id_categoria, nome, descricao, unidade_medida) VALUES (1, 1, 'Arroz (Pacote 1kg)', 'Arroz branco tipo 1', 'PCT');
 INSERT INTO produtos (id, id_categoria, nome, descricao, unidade_medida) VALUES (2, 1, 'Feijão Carioca (Pacote 1kg)', 'Feijão carioca tipo 1', 'PCT');
 INSERT INTO produtos (id, id_categoria, nome, descricao, unidade_medida) VALUES (3, 2, 'Fralda Geriátrica G (Pacote 20un)', 'Fralda Geriátrica G noturna', 'PCT');
@@ -33,4 +38,16 @@ INSERT INTO produtos (id, id_categoria, nome, descricao, unidade_medida) VALUES 
 INSERT INTO produtos (id, id_categoria, nome, descricao, unidade_medida) VALUES (7, 4, 'Cadeira de Rodas Simples', 'Cadeira de rodas para transporte', 'UN');
 
 -- O estoque começa VAZIO.
--- Use a API para popular (POST /api/v1/movimentacoes/entradas)
+-- Use a API para popular (POST /api/v1/movimentacoes/entradas).
+
+-- -------------------------------------------
+-- ATUALIZA OS CONTADORES DE ID (A CORREÇÃO)
+-- -------------------------------------------
+-- H2 usa "RESTART WITH" para definir o *próximo* ID a ser usado.
+-- O valor deve ser (o maior ID usado + 1).
+
+ALTER TABLE categorias ALTER COLUMN id RESTART WITH 5;
+ALTER TABLE localizacoes ALTER COLUMN id RESTART WITH 5;
+ALTER TABLE doadores ALTER COLUMN id RESTART WITH 4;
+ALTER TABLE produtos ALTER COLUMN id RESTART WITH 8;
+-- (Não precisamos reiniciar 'usuarios' pois ele começa vazio)

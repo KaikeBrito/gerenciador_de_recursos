@@ -7,6 +7,8 @@ import lombok.*;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,19 +36,22 @@ public class Produto {
     private String unidadeMedida; // Ex: "UN", "PCT", "KG", "L"
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_categoria", nullable = false)
     @ToString.Exclude
     private Categoria categoria;
     
+    @JsonIgnore
     @OneToMany(mappedBy = "produto")
     @ToString.Exclude
     private List<Estoque> estoques;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "produto")
     @ToString.Exclude
     private List<ItemEntrada> itensEntrada;
-
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "produto")
     @ToString.Exclude
     private List<ItemSaida> itensSaida;
