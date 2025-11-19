@@ -5,12 +5,14 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtTokenService {
@@ -30,11 +32,17 @@ public class JwtTokenService {
         Date agora = new Date();
         Date dataExpiracao = new Date(agora.getTime() + expirationMs);
 
+        // --- CORREÇÃO: Extrai as roles e converte para String ---
+        String roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
         return Jwts.builder()
-                .subject(userDetails.getUsername()) // O "dono" do token (neste caso, o email)
+                .subject(userDetails.getUsername())
+                .claim("roles", roles) // <--- ADICIONAMOS AS ROLES AQUI
                 .issuedAt(agora)
                 .expiration(dataExpiracao)
-                .signWith(getSigningKey()) // Assina o token com a chave secreta
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -57,7 +65,6 @@ public class JwtTokenService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    // Método genérico para ler qualquer "claim" (informação) do token
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -71,7 +78,6 @@ public class JwtTokenService {
                 .getPayload();
     }
 
-    // Pega a chave secreta (em Base64) e a converte em um objeto SecretKey
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);

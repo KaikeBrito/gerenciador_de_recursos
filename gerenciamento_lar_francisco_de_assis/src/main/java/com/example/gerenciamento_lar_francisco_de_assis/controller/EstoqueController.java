@@ -15,29 +15,43 @@ import com.example.gerenciamento_lar_francisco_de_assis.domain.dto.EstoqueAlerta
 import com.example.gerenciamento_lar_francisco_de_assis.domain.entity.Estoque;
 import com.example.gerenciamento_lar_francisco_de_assis.service.EstoqueService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/estoque")
 @RequiredArgsConstructor
+@Tag(name = "6. Estoque (Consultas)", description = "Endpoints para consultar o estado do estoque")
 public class EstoqueController {
 
     private final EstoqueService estoqueService;
 
     // GET /api/v1/estoque
+    @Operation(summary = "Listar o status completo do estoque")
+    @ApiResponse(responseCode = "200", description = "Lista retornada")
     @GetMapping
     public ResponseEntity<List<Estoque>> getEstoqueCompleto() {
         return ResponseEntity.ok(estoqueService.listarEstoqueCompleto());
     }
 
     // GET /api/v1/estoque/alertas
+    @Operation(summary = "Listar itens com estoque abaixo do nível mínimo de alerta")
+    @ApiResponse(responseCode = "200", description = "Lista retornada")
     @GetMapping("/alertas")
     public ResponseEntity<List<Estoque>> getEstoquesBaixos() {
         return ResponseEntity.ok(estoqueService.listarEstoquesBaixos());
     }
 
     // GET /api/v1/estoque/item?idProduto=1&idLocalizacao=2
+    @Operation(summary = "Buscar um item de estoque por ID do Produto e ID da Localização")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Item de estoque encontrado"),
+        @ApiResponse(responseCode = "404", description = "Item não encontrado nesta combinação")
+    })
     @GetMapping("/item")
     public ResponseEntity<Estoque> getEstoquePorProdutoELocal(
             @RequestParam Long idProduto,
@@ -46,6 +60,11 @@ public class EstoqueController {
     }
 
     // PATCH /api/v1/estoque/{id}/alerta
+    @Operation(summary = "Definir o nível mínimo de alerta para um item de estoque")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Nível de alerta atualizado"),
+        @ApiResponse(responseCode = "404", description = "Item de estoque não encontrado")
+    })
     @PatchMapping("/{idEstoque}/alerta")
     public ResponseEntity<Estoque> definirAlerta(
             @PathVariable Long idEstoque,

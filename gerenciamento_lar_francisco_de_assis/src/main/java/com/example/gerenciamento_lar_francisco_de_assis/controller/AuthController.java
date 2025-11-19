@@ -1,6 +1,7 @@
 package com.example.gerenciamento_lar_francisco_de_assis.controller;
 
 import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,18 +20,32 @@ import com.example.gerenciamento_lar_francisco_de_assis.domain.entity.Usuario;
 import com.example.gerenciamento_lar_francisco_de_assis.service.JwtTokenService;
 import com.example.gerenciamento_lar_francisco_de_assis.service.UsuarioService;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Tag(name = "1. Autenticação", description = "Endpoints para login e registro de usuários")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
     private final UsuarioService usuarioService;
     
+    @Operation(
+        summary = "Login de Usuário",
+        description = "Autentica um usuário e retorna um token JWT."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Login bem-sucedido, token retornado"),
+        @ApiResponse(responseCode = "400", description = "Requisição inválida (ex: e-mail ou senha faltando)"),
+        @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    })
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto dto) {
         // 1. O AuthenticationManager usará nosso CustomUserDetailsService e PasswordEncoder
@@ -43,6 +58,14 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponseDto(token));
     }
     
+    @Operation(
+        summary = "Registrar Novo Usuário",
+        description = "Registra um novo usuário com papel padrão (ESTOQUISTA)."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuário registrado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Dados inválidos (ex: e-mail já existe, senha fraca)")
+    })
     @PostMapping("/register")
     public ResponseEntity<UsuarioResponseDto> registrarUsuario(@Valid @RequestBody RegisterRequestDto dto) {
         

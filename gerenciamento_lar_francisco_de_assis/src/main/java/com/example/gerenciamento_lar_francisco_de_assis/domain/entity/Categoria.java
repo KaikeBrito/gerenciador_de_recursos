@@ -7,6 +7,8 @@ import lombok.*;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,7 +29,8 @@ public class Categoria {
 
     @Size(max = 255)
     private String descricao;
-
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "categoria")
     @ToString.Exclude
     private List<Produto> produtos;

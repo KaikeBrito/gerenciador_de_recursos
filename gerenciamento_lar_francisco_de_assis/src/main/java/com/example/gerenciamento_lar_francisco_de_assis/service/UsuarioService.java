@@ -99,7 +99,7 @@ public class UsuarioService {
                 .senha(senhaHash)
                 // 4. ROBUSTEZ: Define um papel padrão.
                 // Nunca permita que um usuário se cadastre como ADMIN.
-                .papel(PapelUsuario.ESTOQUISTA) 
+                .papel(dto.papel() != null ? dto.papel() : PapelUsuario.ESTOQUISTA) 
                 .build();
 
         // 5. Salva no banco

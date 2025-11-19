@@ -83,7 +83,7 @@ public class GestaoRecursosService {
                     .build();
             itensSalvos.add(item);
             
-            estoqueService.adicionarEstoque(produto, local, itemDto.quantidade());
+            estoqueService.adicionarEstoque(produto, local, itemDto.quantidade(), itemDto.dataValidade());
         }
 
         itemEntradaRepository.saveAll(itensSalvos);
