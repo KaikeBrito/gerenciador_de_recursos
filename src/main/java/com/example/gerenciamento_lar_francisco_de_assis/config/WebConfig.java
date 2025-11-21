@@ -13,9 +13,13 @@ public class WebConfig implements WebMvcConfigurer {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")
-                    .allowedOrigins("http://localhost:3000", "http://localhost:5173") 
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS") 
+                registry.addMapping("/**") // Aplica a todas as rotas
+                    .allowedOrigins(
+                        "http://localhost:3000",  // Para testes locais
+                        "http://localhost:5173",  // Para testes locais (Vite)
+                        "https://lar-stock-manager-production.up.railway.app" // <--- ADICIONE ESTA LINHA (Seu Frontend de Prod)
+                    ) 
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD", "TRACE", "CONNECT") 
                     .allowedHeaders("*") 
                     .allowCredentials(true);
             }
