@@ -38,4 +38,4 @@ USER springuser
 EXPOSE 8080
 
 # Comando para iniciar a aplicação (o .jar)
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT java -Dserver.port=${PORT:-8080} -jar app.jar
