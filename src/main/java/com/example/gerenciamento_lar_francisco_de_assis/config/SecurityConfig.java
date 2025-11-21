@@ -1,10 +1,10 @@
 package com.example.gerenciamento_lar_francisco_de_assis.config;
 
-// Importe esta
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -49,34 +49,34 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. HABILITA O CORS USANDO A CONFIGURAÇÃO DO WebConfig
-            .cors(withDefaults()) // <-- ESTA É A LINHA QUE FALTAVA
+            // 1. IMPORTANTE: Habilita o CORS usando a configuração do WebConfig
+            .cors(withDefaults()) 
             
-            // 2. Desabilita CSRF (padrão para APIs stateless)
+            // 2. Desabilita CSRF
             .csrf(csrf -> csrf.disable())
             
-            // 3. Define as regras de autorização
+            // 3. Regras de Autorização
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/v1/auth/**").permitAll() // Permite /login E /register
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll() // Libera o Swagger
+                // Libera requisições OPTIONS (Pre-flight do CORS)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                // Libera endpoints de autenticação (adicionei variações comuns para garantir)
+                .requestMatchers("/api/v1/auth/**", "/auth/**", "/api/auth/**").permitAll()
                 
-                // Exige autenticação para todos os outros endpoints
+                // Libera Swagger e H2
+                .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                
+                // Exige autenticação para o resto
                 .anyRequest().authenticated()
             )
             
-            // 4. Define a política de sessão como STATELESS (sem estado)
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            // 5. Diz ao QSpring para usar nosso provedor de autenticação
             .authenticationProvider(authenticationProvider())
-
-            // 6. Adiciona nosso filtro JWT *antes* do filtro padrão de login
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-            
-            // 7. (Necessário para o H2 Console funcionar em navegadores)
             .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
         return http.build();
