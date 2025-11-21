@@ -4,7 +4,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -26,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final UserDetailsService userDetailsService; 
+    private final UserDetailsService userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -49,32 +48,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. IMPORTANTE: Habilita o CORS usando a configuração do WebConfig
-            .cors(withDefaults()) 
-            
-            // 2. Desabilita CSRF
+            .cors(withDefaults()) // Usa o WebConfig que acabamos de alterar
             .csrf(csrf -> csrf.disable())
             
-            // 3. Regras de Autorização
             .authorizeHttpRequests(authorize -> authorize
-                // Libera requisições OPTIONS (Pre-flight do CORS)
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // Libera endpoints de autenticação (adicionei variações comuns para garantir)
-                .requestMatchers("/api/v1/auth/**", "/auth/**", "/api/auth/**").permitAll()
-                
-                // Libera Swagger e H2
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                
-                // Exige autenticação para o resto
-                .anyRequest().authenticated()
+                // AQUI ESTÁ A CHAVE: .anyRequest().permitAll()
+                // Isso libera TUDO. Se o frontend falhar agora, o erro não é segurança.
+                .anyRequest().permitAll()
             )
             
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-
+            
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));

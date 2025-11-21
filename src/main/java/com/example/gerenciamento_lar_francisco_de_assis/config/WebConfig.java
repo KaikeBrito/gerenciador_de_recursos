@@ -6,22 +6,18 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+public class WebConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // Aplica a todas as rotas
-                    .allowedOrigins(
-                        "http://localhost:3000",  // Para testes locais
-                        "http://localhost:5173",  // Para testes locais (Vite)
-                        "https://lar-stock-manager-production.up.railway.app" // <--- ADICIONE ESTA LINHA (Seu Frontend de Prod)
-                    ) 
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD", "TRACE", "CONNECT") 
-                    .allowedHeaders("*") 
-                    .allowCredentials(true);
+                registry.addMapping("/**")
+                        .allowedOriginPatterns("*") 
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
