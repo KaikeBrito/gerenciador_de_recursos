@@ -1,6 +1,5 @@
 package com.example.gerenciamento_lar_francisco_de_assis.config;
 
-// Importe esta
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import org.springframework.context.annotation.Bean;
@@ -49,34 +48,39 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. HABILITA O CORS USANDO A CONFIGURAÇÃO DO WebConfig
-            .cors(withDefaults()) // <-- ESTA É A LINHA QUE FALTAVA
+            // 1. HABILITA O CORS
+            .cors(withDefaults())
             
-            // 2. Desabilita CSRF (padrão para APIs stateless)
+            // 2. Desabilita CSRF
             .csrf(csrf -> csrf.disable())
             
-            // 3. Define as regras de autorização
+            // 3. DEFINE AS REGRAS DE AUTORIZAÇÃO (AQUI ESTÁ A MUDANÇA)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/v1/auth/**").permitAll() // Permite /login E /register
+                // Mantemos as configurações específicas (opcional, mas bom para documentação)
+                .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll() // Libera o Swagger
+                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 
-                // Exige autenticação para todos os outros endpoints
-                .anyRequest().authenticated()
+                // MUDANÇA CRÍTICA AQUI:
+                // Antes estava .authenticated(), agora mudamos para .permitAll()
+                // Isso libera o acesso a TODAS as rotas, inclusive a raiz "/"
+                .anyRequest().permitAll() 
             )
             
-            // 4. Define a política de sessão como STATELESS (sem estado)
+            // 4. Sessão Stateless
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            // 5. Diz ao QSpring para usar nosso provedor de autenticação
+            // 5. Provedor de autenticação
             .authenticationProvider(authenticationProvider())
 
-            // 6. Adiciona nosso filtro JWT *antes* do filtro padrão de login
+            // 6. Filtro JWT
+            // Nota: Mesmo com acesso liberado, o filtro ainda roda. 
+            // Se o usuário mandar token, ele será identificado. Se não mandar, ele entra como anônimo.
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             
-            // 7. (Necessário para o H2 Console funcionar em navegadores)
+            // 7. Headers para H2
             .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
         return http.build();
